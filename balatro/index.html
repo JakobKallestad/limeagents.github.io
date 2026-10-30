@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Balatro Unlock Tracker</title>
+<style>
+:root{--bg:#0f1115;--panel:#171b21;--line:#2a313b;--text:#f5f7fa;--muted:#9aa4b0;--good:#70d49a;--warn:#f0c66d;--bad:#ef7d7d;--blue:#7da7ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 system-ui,-apple-system,Segoe UI,sans-serif}button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+.wrap{max-width:980px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}h1{font-size:22px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:3px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:10px}.row{display:flex;gap:8px;align-items:center;padding:7px 0}.row+.row{border-top:1px solid #ffffff0d}.grow{flex:1}.muted{color:var(--muted);font-size:11px}
+input[type=text],input[type=number],select{background:#101419;border:1px solid var(--line);border-radius:8px;padding:7px 8px;width:100%}input[type=checkbox]{width:16px;height:16px;accent-color:var(--blue)}
+.btn{background:#232a33;border:1px solid var(--line);border-radius:8px;padding:7px 10px}.btn.primary{background:#2d5199;border-color:#5f80c6}.btn.danger{background:#3a2023;border-color:#694047}.actions{display:flex;gap:6px;flex-wrap:wrap}
+.phase{display:grid;grid-template-columns:1.6fr .7fr .7fr;gap:8px}.field label{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.mode{display:flex;gap:5px}.mode button{flex:1}.mode .active{background:#2d5199;border-color:#5f80c6}.banner{border:1px solid #3a4a63;background:#152030;border-radius:9px;padding:8px 9px;margin:9px 0}.banner b{display:block;font-size:12px}.banner span{font-size:11px;color:var(--muted)}
+.hands{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.hand{border:1px solid var(--line);background:#11151a;border-radius:8px;padding:6px;font-size:11px;display:flex;gap:5px;align-items:center}.mini{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.step{display:flex;align-items:center;gap:4px}.step button{width:28px;height:28px;border:1px solid var(--line);background:#252c35;border-radius:7px}.step input{width:62px;text-align:center;padding:5px}
+.pills{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.pill{border:1px solid var(--line);border-radius:999px;padding:4px 7px;font-size:11px}.good{color:#a9e8c5;border-color:#39684f}.warn{color:#f2d28e;border-color:#735d30}.bad{color:#f0a1a1;border-color:#713d42}
+.progress{height:5px;background:#0c1014;border-radius:99px;overflow:hidden;margin-top:4px}.progress i{display:block;height:100%;background:var(--blue)}
+.goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.goal{display:flex;gap:6px;align-items:center;padding:6px 7px;border:1px solid var(--line);background:#11151a;border-radius:8px;font-size:12px}.tag{margin-left:auto;color:var(--muted);font-size:10px}
+.warnbox{display:grid;gap:5px}.warnline{display:flex;gap:7px;align-items:flex-start;padding:6px 7px;border:1px solid var(--line);background:#11151a;border-radius:8px;font-size:11px}.warnline b{font-size:11px}.warnline span{color:var(--muted)}
+details{margin-top:8px;border-top:1px solid #ffffff0d;padding-top:8px}summary{cursor:pointer;color:var(--muted);font-size:11px}.footer{text-align:center;color:var(--muted);font-size:10px;margin-top:8px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.phase{grid-template-columns:1fr 1fr}.phase .field:first-child{grid-column:1/-1}.hands{grid-template-columns:repeat(2,1fr)}.mini{grid-template-columns:repeat(2,1fr)}.goals{grid-template-columns:1fr}.top{flex-direction:column}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top"><div><h1>Balatro Unlock Tracker</h1><div class="sub">Compact tracker for protected wins, Blank/Retcon farming, and the few unlocks you want to avoid.</div></div><div class="actions"><button class="btn" id="export">Export</button><button class="btn" id="import">Import</button><button class="btn danger" id="reset">Reset</button></div></div>
+
+<div class="card">
+  <div class="phase">
+    <div class="field"><label>Current phase</label><select id="phase">
+      <option value="setup">Setup / unlock Yellow</option><option value="win1">Protected win 1 — Yellow White</option><option value="win2">Protected win 2 — Yellow Red</option><option value="win3">Protected win 3 — Yellow Green</option><option value="win4">Protected win 4 — Yellow Black</option><option value="win5">Protected win 5 — Yellow Blue</option><option value="farm">Blank + Retcon farm</option><option value="cleanup">Cleanup targets</option><option value="done">Core goals done</option>
+    </select></div>
+    <div class="field"><label>Deck</label><input id="deck" type="text"></div>
+    <div class="field"><label>Stake</label><input id="stake" type="text"></div>
+  </div>
+</div>
+
+<div class="grid">
+<div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>Current run</b><div class="mode"><button class="btn" id="protected">Protected win</button><button class="btn" id="farm">Farm / no win</button></div></div>
+    <div class="banner" id="banner"></div>
+    <div id="handsBlock"><div class="muted" style="margin-bottom:5px">Before a protected Ante 8 win, register each exact hand:</div><div class="hands">
+      <label class="hand"><input type="checkbox" data-hand="pair">Pair</label><label class="hand"><input type="checkbox" data-hand="three">3 of a Kind</label><label class="hand"><input type="checkbox" data-hand="four">4 of a Kind</label><label class="hand"><input type="checkbox" data-hand="straight">Straight</label><label class="hand"><input type="checkbox" data-hand="flush">Flush</label>
+    </div></div>
+    <div class="mini">
+      <div class="field"><label>Round</label><input id="round" type="number" min="0"></div>
+      <div class="field"><label>Enhanced cards</label><input id="enhanced" type="number" min="0"></div>
+      <div class="field"><label>Vouchers this run</label><input id="vouchers" type="number" min="0"></div>
+      <div class="field"><label>Max Jokers held</label><input id="maxJokers" type="number" min="0"></div>
+    </div>
+    <div class="row"><input id="blankRun" type="checkbox"><div class="grow"><b>Blank bought this run</b><div class="muted">Adds +1 to Antimatter progress when you record the run.</div></div></div>
+    <div class="row"><div class="grow"><b>New Blinds this run</b><div class="muted">Only count new Collection entries.</div></div><div class="step"><button data-step="newBlinds" data-d="-1">−</button><input id="newBlinds" type="number" min="0"><button data-step="newBlinds" data-d="1">+</button></div></div>
+    <div class="pills" id="warnings"></div>
+    <div class="actions" style="margin-top:9px"><button class="btn primary" id="finish">Record run</button><button class="btn" id="clearRun">Clear run</button></div>
+  </div>
+
+  <div class="card">
+    <b>Lifetime progress</b>
+    <div class="row"><div class="grow"><b>Blank redemptions → Antimatter</b><div class="muted">10 total</div><div class="progress"><i id="blankBar"></i></div></div><div class="step"><button data-life="blank" data-d="-1">−</button><input id="blank" type="number" min="0" max="10"><button data-life="blank" data-d="1">+</button></div></div>
+    <div class="row"><div class="grow"><b>Different Blinds → Retcon</b><div class="muted">25 total</div><div class="progress"><i id="blindBar"></i></div></div><div class="step"><button data-life="blinds" data-d="-1">−</button><input id="blinds" type="number" min="0" max="30"><button data-life="blinds" data-d="1">+</button></div></div>
+    <div class="row"><div class="grow"><b>Cards sold</b><div class="muted">Keep below 50 to avoid Burnt Joker</div><div class="progress"><i id="soldBar"></i></div></div><div class="step"><button data-life="sold" data-d="-1">−</button><input id="sold" type="number" min="0"><button data-life="sold" data-d="1">+</button></div></div>
+    <details><summary>Optional progress</summary>
+      <div class="row"><div class="grow">Shop spend → Overstock Plus <span class="muted">(2500)</span></div><div class="step"><button data-life="spend" data-d="-100">−</button><input id="spend" type="number" min="0"><button data-life="spend" data-d="100">+</button></div></div>
+      <div class="row"><div class="grow">Arcana-pack Tarots → Omen Globe <span class="muted">(25)</span></div><div class="step"><button data-life="omen" data-d="-1">−</button><input id="omen" type="number" min="0"><button data-life="omen" data-d="1">+</button></div></div>
+      <div class="row"><input id="palette" type="checkbox"><div class="grow">Palette achieved</div></div>
+    </details>
+  </div>
+</div>
+
+<div>
+  <div class="card"><b>Current goal</b><div class="banner" id="goalText"></div><button class="btn" id="nextPhase">Next phase</button></div>
+  <div class="card"><b>Main goals</b><div class="goals" id="goals"></div></div>
+  <div class="card"><b>What not to do</b><div class="warnbox">
+    <div class="warnline"><b>Protected wins</b><span>Do not finish before all 5 hand boxes are checked or before round 19.</span></div>
+    <div class="warnline"><b>Enhanced cards</b><span>Never reach 16 in the deck.</span></div>
+    <div class="warnline"><b>Sales</b><span>Avoid unnecessary selling; 50 lifetime card sales unlock Burnt Joker.</span></div>
+    <div class="warnline"><b>5 Jacks</b><span>Never discard five Jacks together.</span></div>
+    <div class="warnline"><b>100M</b><span>Do not score 100,000,000+ chips in one hand.</span></div>
+    <div class="warnline"><b>Voucher collateral</b><span>Avoid 10 vouchers in one run, heavy paid rerolls, Ante 12, and large shop-card/Tarot/Planet purchase counts.</span></div>
+  </div></div>
+</div>
+</div>
+
+<div class="footer">Saved automatically in this browser. Use Export if you want a backup.</div>
+<input id="file" type="file" accept="application/json" hidden>
+</div>
+<script>
+const D={phase:'setup',deck:'Yellow',stake:'White',mode:'protected',run:{pair:false,three:false,four:false,straight:false,flush:false,round:0,enhanced:0,vouchers:0,maxJokers:0,blankRun:false,newBlinds:0},life:{blank:0,blinds:0,sold:0,spend:0,omen:0,palette:false},goals:{yellow:false,ghost:false,anaglyph:false,plasma:false,blueprint:false,invisible:false,brainstorm:false,troubadour:false,hanging:false,antimatter:false,retcon:false,palette:false,overstock:false,omen:false}};
+const P={setup:['Setup / unlock Yellow','Get Yellow if needed. Buy Blank whenever offered, see new Blinds, and opportunistically work on Showman, Troubadour, Hanging Chad and Brainstorm.'],win1:['Protected win 1 — Yellow White','Win on Yellow. If Invisible is still locked, never hold more than four Jokers.'],win2:['Protected win 2 — Yellow Red','Protected Yellow win. Buy Blank if offered and keep the Rare-Joker safety checks clear.'],win3:['Protected win 3 — Yellow Green','Protected Yellow win. Keep progressing Blank and new Blind counts.'],win4:['Protected win 4 — Yellow Black','Protected win for Anaglyph.'],win5:['Protected win 5 — Yellow Blue','Protected win for Plasma.'],farm:['Blank + Retcon farm','Non-winning runs: buy Blank whenever offered and continue only as long as useful for new Blinds.'],cleanup:['Cleanup targets','Use non-winning runs for Brainstorm, Troubadour, Hanging Chad and optional Omen/Palette progress.'],done:['Core goals done','Your core unlock project is complete. Keep the warnings only if you still want to preserve the unlock pool.']};
+const G=[['yellow','Yellow','Deck'],['ghost','Ghost','Deck'],['anaglyph','Anaglyph','Deck'],['plasma','Plasma','Deck'],['blueprint','Blueprint','Rare'],['invisible','Invisible Joker','Rare'],['brainstorm','Brainstorm','Rare'],['troubadour','Troubadour','Joker'],['hanging','Hanging Chad','Joker'],['antimatter','Antimatter','Voucher'],['retcon','Retcon','Voucher'],['palette','Palette','Optional'],['overstock','Overstock Plus','Optional'],['omen','Omen Globe','Optional']];
+const phases=['setup','win1','win2','win3','win4','win5','farm','cleanup','done']; const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function clone(x){return JSON.parse(JSON.stringify(x))}function merge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k])merge(a[k],b[k]);else a[k]=b[k]}return a}
+let s;try{s=merge(clone(D),JSON.parse(localStorage.getItem('balatroHosted')||'{}'))}catch{s=clone(D)}
+function save(){localStorage.setItem('balatroHosted',JSON.stringify(s))}
+function derived(){s.goals.antimatter=s.life.blank>=10;s.goals.retcon=s.life.blinds>=25;s.goals.overstock=s.life.spend>=2500;s.goals.omen=s.life.omen>=25;s.goals.palette=s.life.palette}
+function render(){
+ derived();$('#phase').value=s.phase;$('#deck').value=s.deck;$('#stake').value=s.stake;
+ ['round','enhanced','vouchers','maxJokers','newBlinds'].forEach(k=>$('#'+k).value=s.run[k]);$('#blankRun').checked=s.run.blankRun;
+ ['blank','blinds','sold','spend','omen'].forEach(k=>$('#'+k).value=s.life[k]);$('#palette').checked=s.life.palette;
+ $$('[data-hand]').forEach(x=>x.checked=s.run[x.dataset.hand]);$('#protected').classList.toggle('active',s.mode==='protected');$('#farm').classList.toggle('active',s.mode==='farm');$('#handsBlock').style.display=s.mode==='protected'?'block':'none';
+ $('#banner').innerHTML=s.mode==='protected'?'<b>Protected win</b><span>Finish only after all 5 hands, round 19+, enhanced ≤15, and no active warning.</span>':'<b>Farm / no win</b><span>Prioritize Blank + new Blinds. Stop whenever the run has served its purpose.</span>';
+ $('#goalText').innerHTML='<b>'+P[s.phase][0]+'</b><span>'+P[s.phase][1]+'</span>';
+ $('#blankBar').style.width=Math.min(100,s.life.blank/10*100)+'%';$('#blindBar').style.width=Math.min(100,s.life.blinds/25*100)+'%';$('#soldBar').style.width=Math.min(100,s.life.sold/50*100)+'%';
+ const w=[];if(s.mode==='protected'){const n=['pair','three','four','straight','flush'].filter(k=>s.run[k]).length;w.push([n+'/5 hands',n===5?'good':'bad']);w.push(['Round '+s.run.round,s.run.round>=19?'good':'warn'])}
+ if(s.run.enhanced>=16)w.push(['16+ enhanced','bad']);else if(s.run.enhanced>=13)w.push([s.run.enhanced+'/16 enhanced','warn']);
+ if(s.run.vouchers>=10)w.push(['10+ vouchers','bad']);else if(s.run.vouchers>=8)w.push([s.run.vouchers+'/10 vouchers','warn']);
+ if(s.life.sold>=50)w.push(['Burnt threshold reached','bad']);else if(s.life.sold>=40)w.push([s.life.sold+'/50 sold','warn']);
+ if(s.phase==='win1'&&!s.goals.invisible&&s.run.maxJokers>4)w.push(['Invisible failed this run','bad']);
+ $('#warnings').innerHTML=w.length?w.map(x=>'<span class="pill '+x[1]+'">'+x[0]+'</span>').join(''):'<span class="pill good">No active warnings</span>';
+ $('#goals').innerHTML='';G.forEach(([k,n,t])=>{const l=document.createElement('label');l.className='goal';l.innerHTML='<input type="checkbox" '+(s.goals[k]?'checked':'')+'><span>'+n+'</span><span class="tag">'+t+'</span>';l.querySelector('input').onchange=e=>{s.goals[k]=e.target.checked;if(k==='palette')s.life.palette=e.target.checked;save();render()};$('#goals').appendChild(l)});save()
+}
+function clearRun(){s.run=clone(D.run);save();render()}
+$('#phase').onchange=e=>{s.phase=e.target.value;if(/^win/.test(s.phase)){s.mode='protected';s.deck='Yellow';s.stake={win1:'White',win2:'Red',win3:'Green',win4:'Black',win5:'Blue'}[s.phase]}else if(['farm','cleanup'].includes(s.phase))s.mode='farm';save();render()};
+$('#deck').oninput=e=>{s.deck=e.target.value;save()};$('#stake').oninput=e=>{s.stake=e.target.value;save()};$('#protected').onclick=()=>{s.mode='protected';save();render()};$('#farm').onclick=()=>{s.mode='farm';save();render()};
+$$('[data-hand]').forEach(x=>x.onchange=e=>{s.run[e.target.dataset.hand]=e.target.checked;save();render()});
+['round','enhanced','vouchers','maxJokers','newBlinds'].forEach(k=>$('#'+k).oninput=e=>{s.run[k]=Math.max(0,Number(e.target.value)||0);save();render()});$('#blankRun').onchange=e=>{s.run.blankRun=e.target.checked;save()};
+['blank','blinds','sold','spend','omen'].forEach(k=>$('#'+k).oninput=e=>{s.life[k]=Math.max(0,Number(e.target.value)||0);save();render()});$('#palette').onchange=e=>{s.life.palette=e.target.checked;save();render()};
+$$('[data-step]').forEach(b=>b.onclick=()=>{const k=b.dataset.step;s.run[k]=Math.max(0,(Number(s.run[k])||0)+Number(b.dataset.d));save();render()});$$('[data-life]').forEach(b=>b.onclick=()=>{const k=b.dataset.life;s.life[k]=Math.max(0,(Number(s.life[k])||0)+Number(b.dataset.d));save();render()});
+$('#finish').onclick=()=>{if(s.mode==='protected'){const ok=['pair','three','four','straight','flush'].every(k=>s.run[k])&&s.run.round>=19&&s.run.enhanced<16&&s.run.vouchers<10;if(!ok&&!confirm('This protected run still has a warning. Record anyway?'))return}if(s.run.blankRun)s.life.blank=Math.min(10,s.life.blank+1);s.life.blinds=Math.min(30,s.life.blinds+s.run.newBlinds);clearRun()};
+$('#clearRun').onclick=()=>{if(confirm('Clear only current-run fields?'))clearRun()};$('#nextPhase').onclick=()=>{s.phase=phases[Math.min(phases.length-1,phases.indexOf(s.phase)+1)];$('#phase').dispatchEvent(new Event('change'))};
+$('#export').onclick=()=>{const b=new Blob([JSON.stringify(s,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='balatro-unlock-progress.json';a.click();URL.revokeObjectURL(a.href)};$('#import').onclick=()=>$('#file').click();$('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{s=merge(clone(D),JSON.parse(await f.text()));save();render()}catch{alert('Could not import file')}};$('#reset').onclick=()=>{if(confirm('Reset all saved tracker progress?')){s=clone(D);save();render()}};
+render();
+</script></body></html>
